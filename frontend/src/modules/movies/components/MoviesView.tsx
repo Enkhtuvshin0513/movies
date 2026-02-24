@@ -43,24 +43,14 @@ const MoviesView = () => {
   const totalPages = data?.totalPages ?? 1;
   const total = data?.total ?? 0;
 
-  const setParam = (updates: Record<string, string>) => {
-    setSearchParams(prev => {
-      const next = new URLSearchParams(prev);
-      Object.entries(updates).forEach(([k, v]) => {
-        if (v) next.set(k, v);
-        else next.delete(k);
-      });
-      return next;
-    });
-  };
-
   const handleSearch = (e: { preventDefault(): void }) => {
     e.preventDefault();
-    setParam({ search: searchInput, page: "1" });
+    setSearchParams({ search: searchInput, page: "1" });
   };
 
   const handleGenreSelect = (genre: string) => {
-    setParam({ genre: selectedGenre === genre ? "" : genre, page: "1" });
+    const newGenre = selectedGenre === genre ? "" : genre;
+    setSearchParams({ search, genre: newGenre, page: "1" });
   };
 
   return (
@@ -97,7 +87,7 @@ const MoviesView = () => {
           <Button
             variant={!selectedGenre ? "default" : "outline"}
             size="sm"
-            onClick={() => setParam({ genre: "", page: "1" })}
+            onClick={() => setSearchParams({ search, page: "1" })}
             className="rounded-full text-xs"
           >
             All
@@ -119,12 +109,17 @@ const MoviesView = () => {
           <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
             <span>Showing results for:</span>
             {search && <Badge variant="secondary">"{search}"</Badge>}
-            {selectedGenre && <Badge variant="secondary">{selectedGenre}</Badge>}
+            {selectedGenre && (
+              <Badge variant="secondary">{selectedGenre}</Badge>
+            )}
             <Button
               variant="link"
               size="sm"
               className="h-auto p-0 ml-1"
-              onClick={() => { setSearchInput(""); setParam({ search: "", genre: "", page: "1" }); }}
+              onClick={() => {
+                setSearchInput("");
+                setSearchParams({ page: "1" });
+              }}
             >
               Clear all
             </Button>
@@ -133,7 +128,9 @@ const MoviesView = () => {
 
         {isError && (
           <div className="border border-destructive/50 text-destructive rounded-lg p-6 text-center mb-6">
-            <p className="font-medium">Failed to load movies. Make sure the backend server is running.</p>
+            <p className="font-medium">
+              Failed to load movies. Make sure the backend server is running.
+            </p>
             <Button
               variant="destructive"
               onClick={() => refetch()}
@@ -163,7 +160,9 @@ const MoviesView = () => {
           <div className="text-center py-20 text-muted-foreground">
             <Film className="w-16 h-16 mx-auto mb-4 opacity-30" />
             <p className="text-lg font-medium">No movies found</p>
-            <p className="text-sm mt-1">Try a different search or genre filter.</p>
+            <p className="text-sm mt-1">
+              Try a different search or genre filter.
+            </p>
           </div>
         )}
 
@@ -171,7 +170,13 @@ const MoviesView = () => {
           <div className="flex items-center justify-center gap-4 mt-8">
             <Button
               variant="outline"
-              onClick={() => setParam({ page: String(Math.max(1, page - 1)) })}
+              onClick={() =>
+                setSearchParams({
+                  search,
+                  genre: selectedGenre,
+                  page: String(page - 1)
+                })
+              }
               disabled={page === 1}
             >
               <ChevronLeft className="w-4 h-4 mr-1" />
@@ -182,7 +187,13 @@ const MoviesView = () => {
             </span>
             <Button
               variant="outline"
-              onClick={() => setParam({ page: String(Math.min(totalPages, page + 1)) })}
+              onClick={() =>
+                setSearchParams({
+                  search,
+                  genre: selectedGenre,
+                  page: String(page + 1)
+                })
+              }
               disabled={page === totalPages}
             >
               Next
