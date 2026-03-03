@@ -3,40 +3,49 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "../useAuthContext";
-import { useLogin } from "../hooks/useLogin";
+import { useSignup } from "../hooks/useSignup";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-const schema = z.object({
-  email: z.email("Invalid email"),
-  password: z.string().min(6, "Password must be at least 6 characters")
-});
+const schema = z
+  .object({
+    email: z.email("Invalid email"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirm: z.string()
+  })
+  .refine((data) => data.password === data.confirm, {
+    message: "Passwords do not match",
+    path: ["confirm"]
+  });
 
-type LoginForm = z.infer<typeof schema>;
+type SignupForm = z.infer<typeof schema>;
 
-export const Login = () => {
+export const Signup = () => {
   const { login, user } = useAuth();
-  const mutation = useLogin();
+  const mutation = useSignup();
 
   const {
     register,
     handleSubmit,
     formState: { errors }
-  } = useForm<LoginForm>({ resolver: zodResolver(schema) });
+  } = useForm<SignupForm>({ resolver: zodResolver(schema) });
 
   if (user) {
     return <Navigate to="/admin/create-movie" />;
   }
 
-  const onSubmit = async (data: LoginForm) => {
-    const result = await mutation.mutateAsync(data);
+  const onSubmit = async (data: SignupForm) => {
+    const result = await mutation.mutateAsync({
+      email: data.email,
+      password: data.password
+    });
     login(result.id);
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-sm space-y-6">
-        <h1 className="text-2xl font-bold text-center">Login</h1>
+        <h1 className="text-2xl font-bold text-center">Sign Up</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-1">
@@ -57,6 +66,17 @@ export const Login = () => {
             )}
           </div>
 
+          <div className="space-y-1">
+            <Input
+              type="password"
+              placeholder="Confirm password"
+              {...register("confirm")}
+            />
+            {errors.confirm && (
+              <p className="text-sm text-red-500">{errors.confirm.message}</p>
+            )}
+          </div>
+
           {mutation.error && (
             <p className="text-sm text-red-500">{mutation.error.message}</p>
           )}
@@ -66,14 +86,14 @@ export const Login = () => {
             className="w-full"
             disabled={mutation.isPending}
           >
-            {mutation.isPending ? "Logging in..." : "Login"}
+            {mutation.isPending ? "Creating account..." : "Sign Up"}
           </Button>
         </form>
 
         <p className="text-center text-sm">
-          Don't have an account?{" "}
-          <Link to="/admin/signup" className="underline">
-            Sign up
+          Already have an account?{" "}
+          <Link to="/admin/login" className="underline">
+            Login
           </Link>
         </p>
       </div>

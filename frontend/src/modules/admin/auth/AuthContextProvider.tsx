@@ -13,14 +13,16 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
 
   const { data, isLoading } = useUser(!!token);
 
-  const login = () => {
-    localStorage.setItem("auth-token", "1");
-    setToken("1");
+  const login = (id: string) => {
+    localStorage.setItem("auth-token", id);
+    localStorage.setItem("auth-user-id", id);
+    setToken(id);
     navigate("/admin/create-movie");
   };
 
   const logout = () => {
     localStorage.removeItem("auth-token");
+    localStorage.removeItem("auth-user-id");
     setToken(null);
   };
 

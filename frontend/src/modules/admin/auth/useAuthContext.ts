@@ -5,7 +5,7 @@ interface IAuthContextValue {
     id: string;
   } | null;
 
-  login: () => void;
+  login: (id: string) => void;
   logout: () => void;
   isLoading: boolean;
 }

@@ -37,18 +37,40 @@ export const getMovie = async (id: string): Promise<Movie> => {
 };
 
 export const getUser = async (): Promise<{ id: string }> => {
-  const res = await fetch(`${BASE_URL}/auth/me`, {
-    headers: getHeaders()
-  });
-  return res.json();
+  const userId = localStorage.getItem("auth-user-id");
+  if (!userId) throw new Error("Not authenticated");
+  const users: { id: string; email: string; password: string }[] = JSON.parse(
+    localStorage.getItem("mock-users") || "[]"
+  );
+  const user = users.find((u) => u.id === userId);
+  if (!user) throw new Error("User not found");
+  return { id: user.id };
 };
 
-export const login = async (email: string, password: string) => {
-  const res = await fetch(`${BASE_URL}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  });
-  if (!res.ok) throw new Error("Invalid credentials");
-  return res.json();
+export const login = async (
+  email: string,
+  password: string
+): Promise<{ id: string; email: string }> => {
+  const users: { id: string; email: string; password: string }[] = JSON.parse(
+    localStorage.getItem("mock-users") || "[]"
+  );
+  const user = users.find((u) => u.email === email && u.password === password);
+  if (!user) throw new Error("Invalid credentials");
+  return { id: user.id, email: user.email };
+};
+
+export const signup = async (
+  email: string,
+  password: string
+): Promise<{ id: string; email: string }> => {
+  const users: { id: string; email: string; password: string }[] = JSON.parse(
+    localStorage.getItem("mock-users") || "[]"
+  );
+  if (users.find((u) => u.email === email)) {
+    throw new Error("User already exists");
+  }
+  const user = { id: Date.now().toString(), email, password };
+  users.push(user);
+  localStorage.setItem("mock-users", JSON.stringify(users));
+  return { id: user.id, email: user.email };
 };
