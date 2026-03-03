@@ -77,7 +77,11 @@ const MovieDetailView = () => {
           <p className="text-destructive text-lg font-medium mb-2">
             {isError ? "Failed to load movie details." : "Movie not found"}
           </p>
-          <Button variant="outline" onClick={() => navigate(-1)} className="mt-4">
+          <Button
+            variant="outline"
+            onClick={() => navigate(-1)}
+            className="mt-4"
+          >
             Go Back
           </Button>
         </div>
@@ -118,8 +122,12 @@ const MovieDetailView = () => {
               <div className="mt-4 border rounded-xl p-4 text-center">
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                  <span className="text-3xl font-bold">{movie.imdb.rating}</span>
-                  <span className="text-muted-foreground text-sm self-end mb-1">/10</span>
+                  <span className="text-3xl font-bold">
+                    {movie.imdb.rating}
+                  </span>
+                  <span className="text-muted-foreground text-sm self-end mb-1">
+                    /10
+                  </span>
                 </div>
                 <p className="text-muted-foreground text-xs">IMDb Rating</p>
                 {movie.imdb.votes && (
@@ -167,7 +175,9 @@ const MovieDetailView = () => {
             {movie.genres && movie.genres.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {movie.genres.map(g => (
-                  <Badge key={g} variant="secondary">{g}</Badge>
+                  <Badge key={g} variant="secondary">
+                    {g}
+                  </Badge>
                 ))}
               </div>
             )}
@@ -234,7 +244,8 @@ const MovieDetailView = () => {
                   </span>
                   {movie.tomatoes.viewer.numReviews && (
                     <span className="text-muted-foreground text-sm">
-                      ({movie.tomatoes.viewer.numReviews.toLocaleString()} reviews)
+                      ({movie.tomatoes.viewer.numReviews.toLocaleString()}{" "}
+                      reviews)
                     </span>
                   )}
                 </div>

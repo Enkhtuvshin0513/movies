@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import type { SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useLogin } from "../hooks/useLogin";
 
 const userFormSchema = z.object({
   email: z.email(),
@@ -14,10 +15,15 @@ const userFormSchema = z.object({
 
 export const Login = () => {
   const { user } = useAuth();
-  const { handleSubmit, register } = useForm<z.infer<typeof userFormSchema>>({
+  const { mutate } = useLogin();
+  const {
+    handleSubmit,
+    register,
+    formState: { errors }
+  } = useForm<z.infer<typeof userFormSchema>>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
-      email: "",
+      email: "example@gmail.com",
       password: ""
     }
   });
@@ -27,17 +33,16 @@ export const Login = () => {
   }
 
   const onSubmit: SubmitHandler<z.infer<typeof userFormSchema>> = data => {
-    if (data.password.length < 6) {
-      console.log("12312");
-    }
+    mutate(data);
   };
 
   return (
     <div className="w-full">
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input type="email" {...register("email")} />
-        <Input type="password" {...register("password")} />
 
+        <Input type="password" {...register("password")} />
+        {errors.password && <p>{errors.password.message}</p>}
         <Button type="submit" variant={"outline"}>
           Login
         </Button>

@@ -12,3 +12,8 @@ export const meController = async (
     res.json(undefined);
   }
 };
+
+export const login = async (req: Request, res: Response): Promise<void> => {
+  console.log(req.body);
+  res.send("success");
+};
