@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-const MovieCardSkeleton = () => (
+const RestaurantCardSkeleton = () => (
   <div className="border rounded-lg overflow-hidden">
     <Skeleton className="w-full h-72" />
     <div className="p-3 space-y-2">
@@ -11,4 +11,4 @@ const MovieCardSkeleton = () => (
   </div>
 );
 
-export { MovieCardSkeleton };
+export { RestaurantCardSkeleton };

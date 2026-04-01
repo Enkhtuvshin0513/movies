@@ -1,27 +1,26 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Search, ChevronLeft, ChevronRight, Film } from "lucide-react";
-import { useMovies } from "@/modules/movies/hooks/useMovies";
+import { useRestaurants } from "@/modules/restaurants/hooks/useRestaurants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { MovieCard } from "./MovieCard";
-import { MovieCardSkeleton } from "./MovieCardSkeleton";
+import { RestaurantCard } from "./RestaurantCard.tsx";
+import { RestaurantCardSkeleton } from "./RestaurantCardSkeleton.tsx";
 
-const GENRES = [
-  "Action",
-  "Comedy",
-  "Drama",
-  "Horror",
-  "Romance",
-  "Thriller",
-  "Animation",
-  "Documentary",
-  "Crime",
-  "Sci-Fi"
+const CUISINE = [
+"American",
+"Italian",
+"Mexican",
+"Chinese",
+"Asian",
+"Bakery",
+"Pizza",
+"Spanish",
+"Others"
 ];
 
-const MoviesView = () => {
+const RestaurantsView = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchInput, setSearchInput] = useState(
@@ -32,14 +31,14 @@ const MoviesView = () => {
   const search = searchParams.get("search") ?? "";
   const selectedGenre = searchParams.get("genre") ?? "";
 
-  const { data, isLoading, isError, refetch } = useMovies({
+  const { data, isLoading, isError, refetch } = useRestaurants({
     page,
     limit: 20,
     search: search || undefined,
     genre: selectedGenre || undefined
   });
 
-  const movies = data?.movies ?? [];
+  const restaurants = data?.restaurants ?? [];
   const totalPages = data?.totalPages ?? 1;
   const total = data?.total ?? 0;
 
@@ -59,14 +58,14 @@ const MoviesView = () => {
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
           <div className="flex items-center gap-2 mr-4">
             <Film className="w-6 h-6" />
-            <span className="text-xl font-bold tracking-tight">Movies</span>
+            <span className="text-xl font-bold tracking-tight">Restaurants</span>
           </div>
           <form onSubmit={handleSearch} className="flex gap-2 flex-1 max-w-lg">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Search movies..."
+                placeholder="Search restaurants..."
                 value={searchInput}
                 onChange={e => setSearchInput(e.target.value)}
                 className="pl-9"
@@ -76,7 +75,7 @@ const MoviesView = () => {
           </form>
           {total > 0 && (
             <span className="text-muted-foreground text-sm ml-auto hidden md:block">
-              {total.toLocaleString()} movies
+              {total.toLocaleString()} restaurants
             </span>
           )}
         </div>
@@ -92,15 +91,15 @@ const MoviesView = () => {
           >
             All
           </Button>
-          {GENRES.map(genre => (
+          {CUISINE.map(cuisine => (
             <Button
-              key={genre}
-              variant={selectedGenre === genre ? "default" : "outline"}
+              key={cuisine}
+              variant={selectedGenre === cuisine ? "default" : "outline"}
               size="sm"
-              onClick={() => handleGenreSelect(genre)}
+              onClick={() => handleGenreSelect(cuisine)}
               className="rounded-full text-xs"
             >
-              {genre}
+              {cuisine}
             </Button>
           ))}
         </div>
@@ -129,7 +128,7 @@ const MoviesView = () => {
         {isError && (
           <div className="border border-destructive/50 text-destructive rounded-lg p-6 text-center mb-6">
             <p className="font-medium">
-              Failed to load movies. Make sure the backend server is running.
+              Failed to load restaurants. Make sure the backend server is running.
             </p>
             <Button
               variant="destructive"
@@ -145,21 +144,21 @@ const MoviesView = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {isLoading
             ? Array.from({ length: 20 }).map((_, i) => (
-                <MovieCardSkeleton key={i} />
+                <RestaurantCardSkeleton key={i} />
               ))
-            : movies.map(movie => (
-                <MovieCard
-                  key={movie._id}
-                  movie={movie}
-                  onClick={() => navigate(`/movies/${movie._id}`)}
+            : restaurants.map((restaurant: any) => (
+                <RestaurantCard
+                  key={restaurant._id}
+                  restaurant={restaurant}
+                  onClick={() => navigate(`/restaurants/${restaurant._id}`)}
                 />
               ))}
         </div>
 
-        {!isLoading && !isError && movies.length === 0 && (
+        {!isLoading && !isError && restaurants.length === 0 && (
           <div className="text-center py-20 text-muted-foreground">
             <Film className="w-16 h-16 mx-auto mb-4 opacity-30" />
-            <p className="text-lg font-medium">No movies found</p>
+            <p className="text-lg font-medium">No restaurants found</p>
             <p className="text-sm mt-1">
               Try a different search or genre filter.
             </p>
@@ -206,4 +205,5 @@ const MoviesView = () => {
   );
 };
 
-export { MoviesView };
+export { RestaurantsView };
+export { RestaurantCard };

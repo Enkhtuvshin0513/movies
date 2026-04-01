@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import Movie from "../models/Movie";
+import Restaurant from "../models/Restaurant";
 
-export const getMovies = async (req: Request, res: Response): Promise<void> => {
+export const getRestaurants = async (req: Request, res: Response): Promise<void> => {
   try {
     const page = Math.max(1, parseInt(req.query.page as string) || 1);
     const limit = Math.max(1, parseInt(req.query.limit as string) || 12);
@@ -17,14 +17,14 @@ export const getMovies = async (req: Request, res: Response): Promise<void> => {
       filter.genres = req.query.genre as string;
     }
 
-    const [movies, total] = await Promise.all([
-      Movie.find(filter)
+    const [restaurants, total] = await Promise.all([
+      Restaurant.find(filter)
         .skip(skip)
         .limit(limit)
         .select(
           "title year runtime genres directors cast plot poster rated imdb awards type"
         ),
-      Movie.countDocuments(filter)
+     Restaurant.countDocuments(filter)
     ]);
 
     res.json({
@@ -32,7 +32,7 @@ export const getMovies = async (req: Request, res: Response): Promise<void> => {
       limit,
       total,
       totalPages: Math.ceil(total / limit),
-      movies
+      restaurants
     });
   } catch (err) {
     console.error(err);
@@ -40,19 +40,19 @@ export const getMovies = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getMovieById = async (
+export const getRestaurantById = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const movie = await Movie.findById(req.params.id);
+    const restaurant = await Restaurant.findById(req.params.id);
 
-    if (!movie) {
-      res.status(404).json({ message: "Movie not found" });
+    if (!restaurant) {
+      res.status(404).json({ message: "Restaurant not found" });
       return;
     }
 
-    res.json(movie);
+    res.json(restaurant);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
